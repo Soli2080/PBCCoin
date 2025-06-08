@@ -138,21 +138,25 @@
             }
         }
 
-        async function contractConnect() {
-            try {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                signer = provider.getSigner();
+       async function contractConnect() {
+    try {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
 
-                console.log("Using contract address:", window.mintContractAddress);
-                console.log("ABI loaded:", Array.isArray(window.mintABI));
-                myContract = new ethers.Contract(window.mintContractAddress, window.mintABI, provider);
+        console.log("🚀 ABI:", window.mintABI);
+        console.log("🚀 Contract address:", window.mintContractAddress);
 
-                console.log("✅ Contract initialized:", myContract);
-            } catch (err) {
-                console.error("❌ Error in contractConnect:", err);
-            }
+        if (!window.mintABI || !window.mintContractAddress) {
+            console.error("❌ ABI or contract address not loaded!");
+            return;
         }
 
+        myContract = new ethers.Contract(window.mintContractAddress, window.mintABI, provider);
+        console.log("✅ Contract instance created:", myContract);
+    } catch (err) {
+        console.error("❌ Error in contractConnect:", err);
+    }
+}
         async function mintTokens() {
             const mintAmount = parseInt(document.getElementById('tokenAmount').value);
 
