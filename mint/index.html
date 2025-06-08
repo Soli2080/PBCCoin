@@ -88,9 +88,8 @@
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.5.0/ethers.umd.min.js"></script>
     <script src="./mintABI.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.5.0/ethers.umd.min.js" type="application/javascript"></script>
 </head>
 <body onload="checkWallet()">
 
@@ -111,49 +110,54 @@
     </div>
 
     <script>
-        var myWallet; 
-        var myContract; 
-        var provider;
-        var signer;
+        let myWallet, myContract, provider, signer;
 
         async function checkWallet() {
-            var accountList = await ethereum.request({ method: 'eth_accounts' });
-            myWallet = accountList[0];
+            try {
+                const accounts = await ethereum.request({ method: 'eth_accounts' });
+                myWallet = accounts[0];
 
-            if (!myWallet) {
-                await window.ethereum.request({
-                    method: "eth_requestAccounts",
-                    params: [{ eth_accounts: {} }]
-                });
-                accountList = await ethereum.request({ method: 'eth_accounts' });
-                myWallet = accountList[0];
+                if (!myWallet) {
+                    await ethereum.request({ method: 'eth_requestAccounts' });
+                    const newAccounts = await ethereum.request({ method: 'eth_accounts' });
+                    myWallet = newAccounts[0];
+                }
+
+                if (!myWallet) {
+                    document.getElementById('walletStatus').innerHTML = "Click below to connect your wallet:";
+                    document.getElementById('walletButton').hidden = false;
+                } else {
+                    document.getElementById('walletStatus').innerHTML = "✓ Wallet connected.";
+                    document.getElementById('walletStatus').style.color = "green";
+                    document.getElementById('walletButton').hidden = true;
+                }
+
+                await contractConnect();
+            } catch (err) {
+                console.error("Wallet connection error:", err);
             }
-
-            if (!myWallet) {
-                document.getElementById('walletStatus').innerHTML = "Click below to connect your wallet:";
-                document.getElementById('walletButton').hidden = false;
-            } else {
-                document.getElementById('walletStatus').innerHTML = "✓ Wallet connected.";
-                document.getElementById('walletStatus').style.color = "green";
-                document.getElementById('walletButton').hidden = true;
-            }
-
-            contractConnect();
         }
 
         async function contractConnect() {
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            myContract = new ethers.Contract(mintContractAddress, mintABI, provider);
-            signer = provider.getSigner();
-            var supply = await myContract.totalSupply();
-            console.log("supply=" + supply + " tokenAddr:" + mintContractAddress);
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+
+                console.log("Using contract address:", window.mintContractAddress);
+                console.log("ABI loaded:", Array.isArray(window.mintABI));
+                myContract = new ethers.Contract(window.mintContractAddress, window.mintABI, provider);
+
+                console.log("✅ Contract initialized:", myContract);
+            } catch (err) {
+                console.error("❌ Error in contractConnect:", err);
+            }
         }
 
         async function mintTokens() {
-            var mintAmount = parseInt(document.getElementById('tokenAmount').value);
+            const mintAmount = parseInt(document.getElementById('tokenAmount').value);
+
             if (!mintAmount || mintAmount <= 0) {
-                alert('Please enter a valid number greater than zero.');
+                alert('Please enter a number greater than zero.');
                 return;
             }
 
@@ -161,10 +165,10 @@
                 const contractWithSigner = myContract.connect(signer);
                 const tx = await contractWithSigner.mintFunction(mintAmount);
                 const receipt = await tx.wait();
-                console.log(`Transaction successful with hash: ${receipt.transactionHash}`);
+                console.log("Mint success. Tx Hash:", receipt.transactionHash);
                 document.getElementById('responseMessage').innerHTML = "✅ Tokens minted successfully!";
             } catch (error) {
-                console.error("Error calling mintFunction:", error);
+                console.error("Error minting tokens:", error);
                 document.getElementById('responseMessage').innerHTML = `❌ Error: ${error.message}`;
             }
         }
