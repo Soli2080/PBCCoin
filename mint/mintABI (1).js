@@ -329,3 +329,5 @@ const mintABI = [
 		"type": "function"
 	}
 ]
+window.mintContractAddress = mintContractAddress;
+window.mintABI = mintABI;
