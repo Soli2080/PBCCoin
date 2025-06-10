@@ -1,5 +1,5 @@
 
-const mintContractAddress = '0xB9C81f238806aCfbA7615389f9fE32d5C64f34f5';
+const mintContractAddress = '0x78AF41FF305B4545C7F10392A386160A02ed0C3f';
 
 const mintABI = [
 	{
@@ -148,6 +148,25 @@ const mintABI = [
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "TokensMinted",
+		"type": "event"
 	},
 	{
 		"inputs": [
