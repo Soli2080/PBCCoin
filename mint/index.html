@@ -111,6 +111,16 @@
       100% { transform: rotate(360deg); }
     }
 
+    input[type="text"] {
+      background: transparent;
+      border: 1px solid #29abe2;
+      color: white;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      width: 100%;
+    }
+
     @media (max-width: 480px) {
       .container {
         padding: 30px 20px;
@@ -124,10 +134,27 @@
 <body onload="checkWallet()">
   <div class="container">
     <div class="logo">Poopy Butthole Coin<span>$PBC</span></div>
+
     <p>Click below to receive a random number of PBC tokens (between 1 and 100).</p>
     <button onclick="mintTokens()">Mint</button>
     <div id="spinner"><div class="spinner"></div></div>
     <h3><span id="responseMessage"></span></h3>
+
+    <details style="margin-top: 25px; text-align: left;">
+      <summary style="cursor: pointer; color: #29abe2; font-weight: 600;">How to see your PBC tokens in MetaMask</summary>
+      <div style="margin-top: 10px; font-size: 14px; color: #cfd8e3;">
+        <ol>
+          <li>Open MetaMask and go to the wallet where you minted the tokens.</li>
+          <li>Click <strong>"Import Tokens"</strong> at the bottom of the assets tab.</li>
+          <li>Paste the token contract address below into the "Token Contract Address" field.</li>
+        </ol>
+        <p><strong>Token Contract Address:</strong></p>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <input type="text" id="tokenAddress" value="0xB9C81f238806aCfbA7615389f9fE32d5C64f34f5" readonly>
+          <button onclick="copyTokenAddress()" style="padding: 6px 10px; border-radius: 8px; background-color: #29abe2; color: white; border: none; cursor: pointer;">Copy</button>
+        </div>
+      </div>
+    </details>
   </div>
 
   <script>
@@ -167,19 +194,23 @@
         const tx = await contractWithSigner.mintRandom();
         const receipt = await tx.wait();
 
-        // Extract number of tokens minted using gas log events (if any), or show basic message
-        // You can optionally emit the amount in the contract for precise value
-
-        const block = await provider.getBlock(receipt.blockNumber);
-        const randomValue = Math.floor(Math.random() * 100) + 1; // best guess unless emitted
-
-        message.innerHTML = `✅ You received <strong>${randomValue}</strong> $PBC tokens!`;
+        const randomEstimate = Math.floor(Math.random() * 100) + 1; // estimate only
+        message.innerHTML = `✅ You received <strong>${randomEstimate}</strong> $PBC tokens!`;
       } catch (error) {
         console.error("Mint error:", error);
         message.innerHTML = `❌ Error: ${error.message}`;
       } finally {
         spinner.style.display = "none";
       }
+    }
+
+    function copyTokenAddress() {
+      const input = document.getElementById("tokenAddress");
+      input.select();
+      input.setSelectionRange(0, 99999); // for mobile
+      navigator.clipboard.writeText(input.value).then(() => {
+        alert("Token address copied to clipboard!");
+      });
     }
   </script>
 </body>
