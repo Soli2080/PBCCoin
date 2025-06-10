@@ -9,7 +9,7 @@
     :root {
       --primary: #29abe2;
       --primary-dark: #007aa8;
-      --background: linear-gradient(135deg, #0b0f1c, #0d1528);
+      --background: #0b0f1c;
       --glass-bg: rgba(255, 255, 255, 0.04);
       --border: rgba(255, 255, 255, 0.1);
       --text: #e5e5e5;
@@ -26,26 +26,36 @@
       font-family: 'Inter', sans-serif;
       background: var(--background);
       color: var(--text);
+      overflow-x: hidden;
+    }
+
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      top: 0;
+      left: 0;
+    }
+
+    section {
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      overflow: hidden;
+      padding: 60px 20px;
     }
 
     .container {
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      align-items: center;
-      justify-items: center;
       backdrop-filter: blur(20px);
       background-color: var(--glass-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 60px;
       max-width: 700px;
-      width: 90vw;
+      width: 100%;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+      text-align: center;
     }
 
     .logo {
@@ -53,7 +63,6 @@
       font-weight: 600;
       color: var(--primary);
       margin-bottom: 16px;
-      letter-spacing: 1px;
     }
 
     .logo span {
@@ -63,11 +72,16 @@
       font-weight: 400;
     }
 
+    .wallet-address {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #888;
+    }
+
     p {
       font-size: 18px;
       margin: 20px 0 30px;
       color: #cfd8e3;
-      text-align: center;
     }
 
     button {
@@ -117,8 +131,9 @@
     details {
       width: 100%;
       max-width: 600px;
-      margin-top: 40px;
+      margin: 0 auto;
       color: #cfd8e3;
+      text-align: left;
     }
 
     summary {
@@ -144,32 +159,49 @@
     }
   </style>
 
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.5.0/ethers.umd.min.js"></script>
   <script src="./mintABI.js"></script>
 </head>
 <body onload="checkWallet()">
-  <div class="container">
-    <div class="logo">Poopy Butthole Coin<span>$PBC</span></div>
-    <p>Click below to receive a random number of PBC tokens (between 1 and 100).</p>
-    <button onclick="mintTokens()">Mint</button>
-    <div id="spinner"><div class="spinner"></div></div>
-    <h3><span id="responseMessage"></span></h3>
-    <details>
-      <summary>How to see your PBC tokens in MetaMask</summary>
-      <div style="margin-top: 10px; font-size: 14px;">
-        <ol>
-          <li>Open MetaMask and go to the wallet where you minted the tokens.</li>
-          <li>Click <strong>"Import Tokens"</strong> at the bottom of the assets tab.</li>
-          <li>Paste the token contract address below into the "Token Contract Address" field.</li>
-        </ol>
-        <p><strong>Token Contract Address:</strong></p>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <input type="text" id="tokenAddress" value="0x78AF41FF305B4545C7F10392A386160A02ed0C3f" readonly>
-          <button onclick="copyTokenAddress()" style="padding: 6px 10px; border-radius: 8px; background-color: #29abe2; color: white; border: none; cursor: pointer;">Copy</button>
+  <div id="particles-js"></div>
+
+  <section id="intro">
+    <div class="container">
+      <div class="logo">Poopy Butthole Coin<span>$PBC</span></div>
+      <div class="wallet-address" id="walletAddress">Connecting...</div>
+    </div>
+  </section>
+
+  <section id="instructions">
+    <div class="container">
+      <h2>How to see your PBC tokens in MetaMask</h2>
+      <details open>
+        <summary>Show Instructions</summary>
+        <div style="margin-top: 10px; font-size: 14px;">
+          <ol>
+            <li>Open MetaMask and go to the wallet where you minted the tokens.</li>
+            <li>Click <strong>"Import Tokens"</strong> at the bottom of the assets tab.</li>
+            <li>Paste the token contract address below into the "Token Contract Address" field.</li>
+          </ol>
+          <p><strong>Token Contract Address:</strong></p>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="text" id="tokenAddress" value="0x78AF41FF305B4545C7F10392A386160A02ed0C3f" readonly>
+            <button onclick="copyTokenAddress()">Copy</button>
+          </div>
         </div>
-      </div>
-    </details>
-  </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="mint">
+    <div class="container">
+      <p>Click below to receive a random number of PBC tokens (between 1 and 100).</p>
+      <button onclick="mintTokens()">Mint</button>
+      <div id="spinner"><div class="spinner"></div></div>
+      <h3><span id="responseMessage"></span></h3>
+    </div>
+  </section>
 
   <script>
     let myWallet, myContract, provider, signer;
@@ -185,7 +217,10 @@
           myWallet = newAccounts[0];
         }
 
-        if (myWallet) await contractConnect();
+        if (myWallet) {
+          document.getElementById("walletAddress").innerText = `Wallet: ${myWallet.slice(0, 6)}...${myWallet.slice(-4)}`;
+          await contractConnect();
+        }
       } catch (err) {
         console.error("Wallet connection error:", err);
       }
@@ -241,6 +276,40 @@
         alert("Token address copied to clipboard!");
       });
     }
+
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 60 },
+        color: { value: "#29abe2" },
+        shape: { type: "circle" },
+        opacity: { value: 0.3 },
+        size: { value: 3 },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: "#29abe2",
+          opacity: 0.2,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 2
+        }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: {
+          onhover: { enable: true, mode: "repulse" },
+          onclick: { enable: true, mode: "push" },
+          resize: true
+        },
+        modes: {
+          repulse: { distance: 100 },
+          push: { particles_nb: 4 }
+        }
+      },
+      retina_detect: true
+    });
   </script>
 </body>
 </html>
