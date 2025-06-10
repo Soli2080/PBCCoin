@@ -1,5 +1,5 @@
 
-const mintContractAddress = '0x7A8c9D5916B49F4C6D26592BB7609e3b9db30Bf1';
+const mintContractAddress = '0xB9C81f238806aCfbA7615389f9fE32d5C64f34f5';
 
 const mintABI = [
 	{
@@ -143,14 +143,8 @@ const mintABI = [
 		"type": "event"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "amountToMint",
-				"type": "uint256"
-			}
-		],
-		"name": "mintFunction",
+		"inputs": [],
+		"name": "mintRandom",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -329,5 +323,6 @@ const mintABI = [
 		"type": "function"
 	}
 ]
+
 window.mintContractAddress = mintContractAddress;
 window.mintABI = mintABI;
