@@ -29,8 +29,6 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background-attachment: fixed;
-      background-size: cover;
     }
 
     .container {
@@ -39,9 +37,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 40px;
-      width: 100%;
       max-width: 420px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
       text-align: center;
     }
 
@@ -50,7 +46,6 @@
       font-weight: 600;
       color: var(--primary);
       margin-bottom: 10px;
-      letter-spacing: 1px;
     }
 
     .logo span {
@@ -58,7 +53,6 @@
       font-size: 14px;
       color: #aaa;
       font-weight: 400;
-      letter-spacing: 0.5px;
     }
 
     p {
@@ -144,13 +138,13 @@
       <summary style="cursor: pointer; color: #29abe2; font-weight: 600;">How to see your PBC tokens in MetaMask</summary>
       <div style="margin-top: 10px; font-size: 14px; color: #cfd8e3;">
         <ol>
-          <li>Open MetaMask and go to the wallet where you minted the tokens on the Polygon Network.</li>
-          <li>Click the three dots on the Token page and click <strong>"Import Tokens"</strong> .</li>
-          <li>Go to "Custom Token" and paste the token contract address below into the "Token Contract Address" field.</li>
+          <li>Open MetaMask and go to the wallet where you minted the tokens.</li>
+          <li>Click <strong>"Import Tokens"</strong> at the bottom of the assets tab.</li>
+          <li>Paste the token contract address below into the "Token Contract Address" field.</li>
         </ol>
         <p><strong>Token Contract Address:</strong></p>
         <div style="display: flex; align-items: center; gap: 8px;">
-          <input type="text" id="tokenAddress" value="0xB9C81f238806aCfbA7615389f9fE32d5C64f34f5" readonly>
+          <input type="text" id="tokenAddress" value="0x78AF41FF305B4545C7F10392A386160A02ed0C3f" readonly>
           <button onclick="copyTokenAddress()" style="padding: 6px 10px; border-radius: 8px; background-color: #29abe2; color: white; border: none; cursor: pointer;">Copy</button>
         </div>
       </div>
@@ -194,8 +188,23 @@
         const tx = await contractWithSigner.mintRandom();
         const receipt = await tx.wait();
 
-        const randomEstimate = Math.floor(Math.random() * 100) + 1; // estimate only
-        message.innerHTML = `✅ You received <strong>${randomEstimate}</strong> $PBC tokens!`;
+        let mintedAmount = null;
+
+        for (const log of receipt.logs) {
+          try {
+            const parsed = myContract.interface.parseLog(log);
+            if (parsed.name === "TokensMinted") {
+              mintedAmount = parsed.args.amount.toString();
+              break;
+            }
+          } catch (e) {}
+        }
+
+        if (mintedAmount) {
+          message.innerHTML = `✅ You received <strong>${mintedAmount}</strong> $PBC tokens!`;
+        } else {
+          message.innerHTML = `✅ Mint successful — check wallet for your PBC tokens.`;
+        }
       } catch (error) {
         console.error("Mint error:", error);
         message.innerHTML = `❌ Error: ${error.message}`;
@@ -207,7 +216,7 @@
     function copyTokenAddress() {
       const input = document.getElementById("tokenAddress");
       input.select();
-      input.setSelectionRange(0, 99999); // for mobile
+      input.setSelectionRange(0, 99999);
       navigator.clipboard.writeText(input.value).then(() => {
         alert("Token address copied to clipboard!");
       });
