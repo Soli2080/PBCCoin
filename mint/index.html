@@ -9,95 +9,104 @@
     :root {
       --primary: #29abe2;
       --primary-dark: #007aa8;
-      --background: #0b0f1c;
-      --glass-bg: rgba(255, 255, 255, 0.05);
-      --border: rgba(255, 255, 255, 0.15);
+      --background: linear-gradient(135deg, #0b0f1c, #0d1528);
+      --glass-bg: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.1);
       --text: #e5e5e5;
-      --radius: 16px;
+      --radius: 20px;
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      margin: 0;
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(180deg, #0b0f1c 0%, #0d1528 100%);
+      background: var(--background);
       color: var(--text);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      overflow: hidden;
     }
 
     .container {
-      backdrop-filter: blur(15px);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      align-items: center;
+      justify-items: center;
+      backdrop-filter: blur(20px);
       background-color: var(--glass-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 40px;
-      max-width: 420px;
-      text-align: center;
+      padding: 60px;
+      max-width: 700px;
+      width: 90vw;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
     }
 
     .logo {
-      font-size: 28px;
+      font-size: 36px;
       font-weight: 600;
       color: var(--primary);
-      margin-bottom: 10px;
+      margin-bottom: 16px;
+      letter-spacing: 1px;
     }
 
     .logo span {
       display: block;
-      font-size: 14px;
+      font-size: 16px;
       color: #aaa;
       font-weight: 400;
     }
 
     p {
-      font-size: 16px;
-      margin-bottom: 24px;
+      font-size: 18px;
+      margin: 20px 0 30px;
       color: #cfd8e3;
+      text-align: center;
     }
 
     button {
       background-color: var(--primary);
       color: white;
       border: none;
-      padding: 14px;
-      font-size: 16px;
+      padding: 16px 24px;
+      font-size: 18px;
       border-radius: var(--radius);
       cursor: pointer;
-      width: 100%;
       transition: background 0.3s, transform 0.2s;
+      width: 100%;
+      max-width: 300px;
     }
 
     button:hover {
       background-color: var(--primary-dark);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
     }
 
     h3 {
-      margin-top: 24px;
+      margin-top: 30px;
       font-weight: 400;
-      font-size: 16px;
+      font-size: 18px;
       color: #a6d1f5;
     }
 
     #spinner {
-      margin-top: 20px;
+      margin: 24px 0;
       display: none;
     }
 
     .spinner {
-      width: 36px;
-      height: 36px;
-      border: 4px solid #29abe2;
-      border-top: 4px solid transparent;
+      width: 40px;
+      height: 40px;
+      border: 5px solid #29abe2;
+      border-top: 5px solid transparent;
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: auto;
     }
 
     @keyframes spin {
@@ -105,20 +114,33 @@
       100% { transform: rotate(360deg); }
     }
 
+    details {
+      width: 100%;
+      max-width: 600px;
+      margin-top: 40px;
+      color: #cfd8e3;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    ol {
+      padding-left: 20px;
+      margin-top: 10px;
+    }
+
     input[type="text"] {
       background: transparent;
       border: 1px solid #29abe2;
       color: white;
-      padding: 8px;
-      border-radius: 8px;
-      font-size: 13px;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 14px;
       width: 100%;
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 30px 20px;
-      }
     }
   </style>
 
@@ -128,15 +150,13 @@
 <body onload="checkWallet()">
   <div class="container">
     <div class="logo">Poopy Butthole Coin<span>$PBC</span></div>
-
     <p>Click below to receive a random number of PBC tokens (between 1 and 100).</p>
     <button onclick="mintTokens()">Mint</button>
     <div id="spinner"><div class="spinner"></div></div>
     <h3><span id="responseMessage"></span></h3>
-
-    <details style="margin-top: 25px; text-align: left;">
-      <summary style="cursor: pointer; color: #29abe2; font-weight: 600;">How to see your PBC tokens in MetaMask</summary>
-      <div style="margin-top: 10px; font-size: 14px; color: #cfd8e3;">
+    <details>
+      <summary>How to see your PBC tokens in MetaMask</summary>
+      <div style="margin-top: 10px; font-size: 14px;">
         <ol>
           <li>Open MetaMask and go to the wallet where you minted the tokens.</li>
           <li>Click <strong>"Import Tokens"</strong> at the bottom of the assets tab.</li>
